@@ -16,12 +16,16 @@ func _on_scene_requested(target_scene_path: String, transition_data: TransitionD
 	transitioner.add_to_group("scene_transitioner")
 	_game_root.add_child(transitioner)
 	
+	transitioner.process_mode = Node.PROCESS_MODE_ALWAYS
+	
 	var anim_player: AnimationPlayer = transitioner.get_node("AnimationPlayer")
 	if anim_player == null:
 		push_error("Scene Transitioner is missing an AnimationPlayer node.")
 		_game_root.remove_child(transitioner)
 		transitioner.queue_free()
 		return
+	
+	get_tree().paused = true
 	
 	anim_player.play(transition_data.fade_out_animation)
 	await anim_player.animation_finished
@@ -43,5 +47,7 @@ func _on_scene_requested(target_scene_path: String, transition_data: TransitionD
 	
 	anim_player.play(transition_data.fade_in_animation)
 	await anim_player.animation_finished
+	
+	get_tree().paused = false
 	
 	transitioner.queue_free()
